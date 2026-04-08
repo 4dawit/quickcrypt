@@ -8,7 +8,7 @@ pub fn main() !void {
 
     var quickcrypt = app.rootCommand();
     try quickcrypt.addSubcommand(app.createCommand("view", "View decrypted value from input"));
-    try quickcrypt.addSubcommand(app.createCommand("create", "Create ecrypted value from input (or random)"));
+    try quickcrypt.addSubcommand(app.createCommand("create", "Create ecrypted value from input (or random like UUID)"));
 
     const input = try app.parseProcess();
     if (input.subcommandMatches("help")) |_| {
@@ -19,11 +19,18 @@ pub fn main() !void {
         try app.displayHelp();
     }
 
-    // if (input.subcommandMatches("view")) |view_args| {
-    //     // switch view_args.parse_result.args.key {
-    //     // }
-    // } else if (input.subcommandMatches("create")) |create_args| {
-    // }
+    if (input.subcommandMatches("view")) |view_args| {
+        try utils.parseArgs(view_args) |input, crypt_type| {
+            decrypt.decrypt(input, crypt_type);
+        }
+    } else if (input.subcommandMatches("create")) |create_args| {
+        try utils.parseArgs(create_args) |input, crypt_type| {
+            encrypt.encrypt(input, crypt_type);
+        }
+    } else {
+        display.display("Subcommand does not exist", utils.Status.failure);
+        try app.displayHelp();
+    }
 }
 
 const std = @import("std");
@@ -31,3 +38,5 @@ const yazap = @import("yazap");
 
 const display = @import("display.zig");
 const utils = @import("utils.zig");
+const encrypt = @import("encrypt.zig");
+const decrypt = @import("decrypt.zig");
