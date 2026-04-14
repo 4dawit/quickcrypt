@@ -34,10 +34,4 @@ pub fn build(b: *std.Build) void {
     const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_exe_unit_tests.step);
-
-    const yazap = b.dependency("yazap", .{});
-    exe.root_module.addImport("yazap", yazap.module("yazap"));
-
-    const pretty_zig = b.dependency("prettyzig", .{});
-    exe.root_module.addImport("prettyzig", pretty_zig.module("prettyzig"));
 }

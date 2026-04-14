@@ -2,17 +2,8 @@
     .name = .quickcrypt,
     .version = "0.0.0",
     .fingerprint = 0x6b2fe8bd5002afc1, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.14.1",
-    .dependencies = .{
-        .yazap = .{
-            .url = "git+https://github.com/prajwalch/yazap#fdb6a88e30bd7d27d548dd9f9809df8429f9f87b",
-            .hash = "yazap-0.6.3-Z1t-EhflAQCN128_OyQRyDcnbbVFPngvhwonpAHTq36h",
-        },
-        .prettyzig = .{
-            .url = "git+https://github.com/couchpotato007/prettyzig#61a6f7e80d7b76992b820ec809074a4a3279ad00",
-            .hash = "prettyzig-0.0.0-2dgyeog0AACwIWbBIwVUAjJc9j4ivTJaBjbBF24I0FN0",
-        },
-    },
+    .minimum_zig_version = "0.15.2",
+    .dependencies = .{},
     .paths = .{
         "build.zig",
         "build.zig.zon",

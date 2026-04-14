@@ -1,42 +1,36 @@
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-    const allocator = gpa.allocator();
-    defer _ = gpa.deinit();
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
 
-    var app = yazap.App.init(allocator, "quickcrypt", "Simple CLI tool to quickly sanity check d/encrypted values");
-    defer app.deinit();
+    const input_args = try std.process.argsAlloc(allocator);
+    defer std.process.argsFree(allocator, input_args);
 
-    var quickcrypt = app.rootCommand();
-    try quickcrypt.addSubcommand(app.createCommand("view", "View decrypted value from input"));
-    try quickcrypt.addSubcommand(app.createCommand("create", "Create ecrypted value from input (or random like UUID)"));
-
-    const input = try app.parseProcess();
-    if (input.subcommandMatches("help")) |_| {
-        try app.displayHelp();
-    } else if (input.containsArg("help")) {
-        try app.displayHelp();
-    } else if (input.containsArg("h")) {
-        try app.displayHelp();
-    }
-
-    if (input.subcommandMatches("view")) |view_args| {
-        try utils.parseArgs(view_args) |input, crypt_type| {
-            decrypt.decrypt(input, crypt_type);
+    const crypt_type = args.parse(input_args) catch |err| {
+        switch (err) {
+            error.MissingInput => try args.help("Missing value argument"),
+            error.MissingComparison => try args.help("Missing --compare argument"),
+            error.MissingKey => try args.help("Missing --key argument"),
+            error.UnknownType => try args.help("Unknown crypt type"),
+            error.InvalidArgAmount => try args.help("Invalid amount of arguments provided"),
         }
-    } else if (input.subcommandMatches("create")) |create_args| {
-        try utils.parseArgs(create_args) |input, crypt_type| {
-            encrypt.encrypt(input, crypt_type);
-        }
+
+        return;
+    };
+
+    if (std.mem.eql(u8, input_args[1], "view")) {
+        try decrypt(crypt_type);
+    } else if (std.mem.eql(u8, input_args[1], "create")) {
+        try encrypt(crypt_type);
     } else {
-        display.display("Subcommand does not exist", utils.Status.failure);
-        try app.displayHelp();
+        try args.help("Unknown subcommand");
     }
 }
 
 const std = @import("std");
-const yazap = @import("yazap");
 
-const display = @import("display.zig");
-const utils = @import("utils.zig");
-const encrypt = @import("encrypt.zig");
-const decrypt = @import("decrypt.zig");
+const decrypt = @import("decrypt.zig").decrypt;
+const encrypt = @import("encrypt.zig").encrypt;
+const display = @import("display.zig").display;
+const args = @import("args.zig");
+const types = @import("types.zig");
