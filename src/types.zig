@@ -1,4 +1,5 @@
 pub const Status = enum { success, value_error, cli_error };
+pub const ActionType = enum { view, create };
 
 pub const CryptType = union(enum) {
     JWT: []const u8,

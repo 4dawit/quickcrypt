@@ -82,52 +82,31 @@ pub fn decrypt(crypt_type: CryptType) !void {
         },
 
         .SHA1 => |value| {
-            var hash: [std.crypto.hash.Sha1.digest_length]u8 = undefined;
-            std.crypto.hash.Sha1.hash(value, &hash, .{});
-            const hex = std.fmt.bytesToHex(&hash, .lower);
-            try display(null, &hex, .success);
+            try simpleHexToBytes(std.crypto.hash.Sha1, value);
         },
 
         .SHA2_256 => |value| {
-            var hash: [std.crypto.hash.sha2.Sha256.digest_length]u8 = undefined;
-            std.crypto.hash.sha2.Sha256.hash(value, &hash, .{});
-            const hex = std.fmt.bytesToHex(&hash, .lower);
-            try display(null, &hex, .success);
+            try simpleHexToBytes(std.crypto.hash.sha2.Sha256, value);
         },
 
         .SHA2_512 => |value| {
-            var hash: [std.crypto.hash.sha2.Sha512.digest_length]u8 = undefined;
-            std.crypto.hash.sha2.Sha512.hash(value, &hash, .{});
-            const hex = std.fmt.bytesToHex(&hash, .lower);
-            try display(null, &hex, .success);
+            try simpleHexToBytes(std.crypto.hash.sha2.Sha512, value);
         },
 
         .SHA3_256 => |value| {
-            var hash: [std.crypto.hash.sha3.Sha3_256.digest_length]u8 = undefined;
-            std.crypto.hash.sha3.Sha3_256.hash(value, &hash, .{});
-            const hex = std.fmt.bytesToHex(&hash, .lower);
-            try display(null, &hex, .success);
+            try simpleHexToBytes(std.crypto.hash.sha3.Sha3_256, value);
         },
 
         .Blake2b512 => |value| {
-            var hash: [std.crypto.hash.blake2.Blake2b512.digest_length]u8 = undefined;
-            std.crypto.hash.blake2.Blake2b512.hash(value, &hash, .{});
-            const hex = std.fmt.bytesToHex(&hash, .lower);
-            try display(null, &hex, .success);
+            try simpleHexToBytes(std.crypto.hash.blake2.Blake2b512, value);
         },
 
         .Blake3 => |value| {
-            var hash: [std.crypto.hash.Blake3.digest_length]u8 = undefined;
-            std.crypto.hash.Blake3.hash(value, &hash, .{});
-            const hex = std.fmt.bytesToHex(&hash, .lower);
-            try display(null, &hex, .success);
+            try simpleHexToBytes(std.crypto.hash.Blake3, value);
         },
 
         .MD5 => |value| {
-            var hash: [std.crypto.hash.Md5.digest_length]u8 = undefined;
-            std.crypto.hash.Md5.hash(value, &hash, .{});
-            const hex = std.fmt.bytesToHex(&hash, .lower);
-            try display(null, &hex, .success);
+            try simpleHexToBytes(std.crypto.hash.Md5, value);
         },
 
         .PEM => |value| {
@@ -196,6 +175,12 @@ pub fn decrypt(crypt_type: CryptType) !void {
             try display(null, plaintext, .success);
         },
     }
+}
+
+fn simpleHexToBytes(hash_type: anytype, value: []const u8) !void {
+    var hash: [hash_type.digest_length]u8 = undefined;
+    const bytes = try std.fmt.hexToBytes(&hash, value);
+    try display(null, bytes, .success);
 }
 
 const std = @import("std");
